@@ -1,0 +1,1 @@
+export { QrView } from "./components/qr-view";

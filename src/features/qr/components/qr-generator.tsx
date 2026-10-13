@@ -1,7 +1,6 @@
 "use client";
 
-import { useCallback, useRef, useState } from "react";
-import type QRCodeStyling from "qr-code-styling";
+import { useState } from "react";
 import {
   DEFAULT_STYLE,
   QR_TYPES,
@@ -11,6 +10,12 @@ import {
 } from "../types";
 import { QR_TYPE_CONFIG } from "../lib/form-config";
 import { buildPayload } from "../lib/payloads";
+import { downloadQr } from "../lib/export-qr";
+import { EXPORT_SIZE } from "../lib/qr-options";
+import {
+  DEFAULT_EXPORT_SETTINGS,
+  type ExportSettings,
+} from "../lib/export-options";
 import { QrPreview } from "./qr-preview";
 import { QrForm } from "./qr-form";
 import { TypeSelector } from "./type-selector";
@@ -19,6 +24,7 @@ import { ShapePanel } from "./shape-panel";
 import { LogoPanel } from "./logo-panel";
 import { ContrastWarning } from "./contrast-warning";
 import { DownloadButtons, type DownloadFormat } from "./download-buttons";
+import { DownloadOptions } from "./download-options";
 
 type AllValues = Record<QrType, QrValues>;
 
@@ -30,13 +36,11 @@ export function QrGenerator() {
   const [type, setType] = useState<QrType>("url");
   const [allValues, setAllValues] = useState<AllValues>(initialValues);
   const [style, setStyle] = useState<QrStyle>(DEFAULT_STYLE);
-  const qrRef = useRef<QRCodeStyling | null>(null);
+  const [exportSettings, setExportSettings] = useState<ExportSettings>(
+    DEFAULT_EXPORT_SETTINGS,
+  );
 
   const payload = buildPayload(type, allValues[type]);
-
-  const handleReady = useCallback((qr: QRCodeStyling) => {
-    qrRef.current = qr;
-  }, []);
 
   const handleChange = (name: string, value: string) => {
     setAllValues((prev) => ({
@@ -45,8 +49,16 @@ export function QrGenerator() {
     }));
   };
 
-  const handleDownload = async (extension: DownloadFormat) => {
-    await qrRef.current?.download({ name: "qr-code", extension });
+  // Botones rápidos: PNG o SVG con el tamaño por defecto
+  const handleQuickDownload = async (format: DownloadFormat) => {
+    if (!payload) return;
+    await downloadQr(payload, style, { format, size: EXPORT_SIZE });
+  };
+
+  // Configuración avanzada: el formato y tamaño elegidos
+  const handleAdvancedDownload = async () => {
+    if (!payload) return;
+    await downloadQr(payload, style, exportSettings);
   };
 
   return (
@@ -66,7 +78,7 @@ export function QrGenerator() {
           <div className="flex flex-col items-center gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <div className="flex min-h-72 w-full items-center justify-center rounded-xl bg-slate-50 p-4">
               {payload ? (
-                <QrPreview data={payload} style={style} onReady={handleReady} />
+                <QrPreview data={payload} style={style} />
               ) : (
                 <p className="max-w-52 text-center text-sm text-slate-500">
                   Completa los datos y tu código QR aparecerá aquí
@@ -74,7 +86,17 @@ export function QrGenerator() {
               )}
             </div>
 
-            <DownloadButtons disabled={!payload} onDownload={handleDownload} />
+            <DownloadButtons
+              disabled={!payload}
+              onDownload={handleQuickDownload}
+            />
+
+            <DownloadOptions
+              settings={exportSettings}
+              onChange={setExportSettings}
+              disabled={!payload}
+              onDownload={handleAdvancedDownload}
+            />
 
             <p className="text-center text-xs text-slate-500">
               QR estático: nunca caduca mientras la información enlazada exista.

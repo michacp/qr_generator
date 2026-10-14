@@ -1,0 +1,12 @@
+import type { MetadataRoute } from "next";
+import { siteConfig } from "@/features/seo";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+    return [
+        {
+            url: siteConfig.url,
+            changeFrequency: "monthly",
+            priority: 1,
+        },
+    ];
+}

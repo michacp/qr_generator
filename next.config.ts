@@ -1,14 +1,15 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configuración de Turbopack para Tailwind (si la necesitas)
-  turbopack: {
-    rules: {
-      "*.css": {
-        loaders: ["@tailwindcss/turbopack"],
-        as: "*.css",
+  async redirects() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: "www.ubfix.com" }],
+        destination: "https://ubfix.com/:path*",
+        permanent: true,
       },
-    },
+    ];
   },
 };
 

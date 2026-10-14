@@ -8,9 +8,10 @@ import { PREVIEW_SIZE, buildQrOptions } from "../lib/qr-options";
 type QrPreviewProps = {
   data: string;
   style: QrStyle;
+  label: string;
 };
 
-export function QrPreview({ data, style }: QrPreviewProps) {
+export function QrPreview({ data, style, label }: QrPreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const qrRef = useRef<QRCodeStyling | null>(null);
 
@@ -38,5 +39,5 @@ export function QrPreview({ data, style }: QrPreviewProps) {
     };
   }, [data, style]);
 
-  return <div ref={containerRef} aria-label="Vista previa del código QR" />;
+  return <div ref={containerRef} role="img" aria-label={label} />;
 }

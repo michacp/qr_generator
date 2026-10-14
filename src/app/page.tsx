@@ -15,10 +15,10 @@ export const metadata = buildPageMetadata({
 
 export default function HomePage() {
   return (
-    <>
+    <main>
       <JsonLd data={buildStructuredData(FAQ_ITEMS)} />
       <QrView />
       <LandingContent />
-    </>
+    </main>
   );
 }

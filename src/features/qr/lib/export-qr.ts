@@ -6,6 +6,7 @@ export async function downloadQr(
     data: string,
     style: QrStyle,
     { format, size }: ExportSettings,
+    baseName = "qr-code",
 ) {
     // Import dinámico: la librería necesita el navegador
     const { default: QRCodeStyling } = await import("qr-code-styling");
@@ -18,7 +19,7 @@ export async function downloadQr(
     });
 
     await qr.download({
-        name: isVector ? "qr-code" : `qr-code-${size}px`,
+        name: isVector ? baseName : `${baseName}-${size}px`,
         extension: format,
     });
 }

@@ -10,8 +10,8 @@ type QrFormProps = {
 };
 
 const inputClass =
-  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 placeholder:text-slate-400 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100";
-
+  "w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-slate-900 placeholder:text-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-4 focus:ring-indigo-100";
+  
 export function QrForm({ type, values, onChange }: QrFormProps) {
   const { fields, label } = QR_TYPE_CONFIG[type];
 

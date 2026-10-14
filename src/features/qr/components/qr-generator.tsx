@@ -10,6 +10,7 @@ import {
 } from "../types";
 import { QR_TYPE_CONFIG } from "../lib/form-config";
 import { buildPayload } from "../lib/payloads";
+import { buildFileName } from "../lib/file-name";
 import { downloadQr } from "../lib/export-qr";
 import { EXPORT_SIZE } from "../lib/qr-options";
 import {
@@ -39,8 +40,11 @@ export function QrGenerator() {
   const [exportSettings, setExportSettings] = useState<ExportSettings>(
     DEFAULT_EXPORT_SETTINGS,
   );
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState("");
 
   const payload = buildPayload(type, allValues[type]);
+  const fileName = buildFileName(type, payload);
 
   const handleChange = (name: string, value: string) => {
     setAllValues((prev) => ({
@@ -49,17 +53,33 @@ export function QrGenerator() {
     }));
   };
 
-  // Botones rápidos: PNG o SVG con el tamaño por defecto
-  const handleQuickDownload = async (format: DownloadFormat) => {
-    if (!payload) return;
-    await downloadQr(payload, style, { format, size: EXPORT_SIZE });
+  const runDownload = async (task: () => Promise<void>) => {
+    if (!payload || isDownloading) return;
+
+    setDownloadError("");
+    setIsDownloading(true);
+    try {
+      await task();
+    } catch {
+      setDownloadError(
+        "No se pudo generar la descarga. Prueba con un tamaño menor o con otro formato.",
+      );
+    } finally {
+      setIsDownloading(false);
+    }
   };
 
+  // Botones rápidos: PNG o SVG con el tamaño por defecto
+  const handleQuickDownload = (format: DownloadFormat) =>
+    runDownload(() =>
+      downloadQr(payload, style, { format, size: EXPORT_SIZE }, fileName),
+    );
+
   // Configuración avanzada: el formato y tamaño elegidos
-  const handleAdvancedDownload = async () => {
-    if (!payload) return;
-    await downloadQr(payload, style, exportSettings);
-  };
+  const handleAdvancedDownload = () =>
+    runDownload(() => downloadQr(payload, style, exportSettings, fileName));
+
+  const downloadDisabled = !payload || isDownloading;
 
   return (
     <div className="flex flex-col gap-8">
@@ -76,9 +96,20 @@ export function QrGenerator() {
 
         <div className="md:sticky md:top-6 md:self-start">
           <div className="flex flex-col items-center gap-5 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            {/* Anuncio para lectores de pantalla: solo cambia entre 2 textos */}
+            <p role="status" className="sr-only">
+              {payload
+                ? "Código QR actualizado."
+                : "Completa los datos para generar el código QR."}
+            </p>
+
             <div className="flex min-h-72 w-full items-center justify-center rounded-xl bg-slate-50 p-4">
               {payload ? (
-                <QrPreview data={payload} style={style} />
+                <QrPreview
+                  data={payload}
+                  style={style}
+                  label={`Vista previa del código QR de tipo ${QR_TYPE_CONFIG[type].label}`}
+                />
               ) : (
                 <p className="max-w-52 text-center text-sm text-slate-500">
                   Completa los datos y tu código QR aparecerá aquí
@@ -87,16 +118,28 @@ export function QrGenerator() {
             </div>
 
             <DownloadButtons
-              disabled={!payload}
+              disabled={downloadDisabled}
               onDownload={handleQuickDownload}
             />
 
             <DownloadOptions
               settings={exportSettings}
               onChange={setExportSettings}
-              disabled={!payload}
+              disabled={downloadDisabled}
               onDownload={handleAdvancedDownload}
             />
+
+            {isDownloading && (
+              <p role="status" className="text-sm text-slate-600">
+                Preparando descarga...
+              </p>
+            )}
+
+            {downloadError && (
+              <p role="alert" className="text-center text-sm text-red-700">
+                {downloadError}
+              </p>
+            )}
 
             <p className="text-center text-xs text-slate-500">
               QR estático: nunca caduca mientras la información enlazada exista.

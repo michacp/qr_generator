@@ -14,8 +14,8 @@ export function ContrastWarning({ fgColor, bgColor }: ContrastWarningProps) {
 
   return (
     <div
-      role="alert"
-      className={`flex flex-col gap-1 rounded-lg border p-3 text-sm ${
+      role="status"
+      className={`flex flex-col gap-1 rounded-xl border p-3 text-sm ${
         isDanger
           ? "border-red-300 bg-red-50 text-red-800"
           : "border-amber-300 bg-amber-50 text-amber-800"

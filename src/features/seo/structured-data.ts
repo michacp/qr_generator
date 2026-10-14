@@ -12,11 +12,22 @@ export function buildStructuredData(faq: readonly FaqItem[]) {
                 url: siteConfig.url,
                 name: siteConfig.name,
                 inLanguage: siteConfig.language,
+                publisher: { "@id": `${siteConfig.url}/#organization` },
+            },
+            {
+                "@type": "Organization",
+                "@id": `${siteConfig.url}/#organization`,
+                name: siteConfig.name,
+                url: siteConfig.url,
+                logo: {
+                    "@type": "ImageObject",
+                    url: siteConfig.logoUrl,
+                },
             },
             {
                 "@type": "WebApplication",
                 "@id": `${siteConfig.url}/#app`,
-                name: "Generador de códigos QR",
+                name: "Generador de códigos QR Ubfix",
                 url: siteConfig.url,
                 description: siteConfig.description,
                 applicationCategory: "UtilitiesApplication",
@@ -25,9 +36,11 @@ export function buildStructuredData(faq: readonly FaqItem[]) {
                 inLanguage: siteConfig.language,
                 isAccessibleForFree: true,
                 offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+                author: { "@id": `${siteConfig.url}/#organization` },
             },
             {
                 "@type": "FAQPage",
+                "@id": `${siteConfig.url}/#faq`,
                 mainEntity: faq.map(({ question, answer }) => ({
                     "@type": "Question",
                     name: question,

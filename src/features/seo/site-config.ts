@@ -6,4 +6,5 @@ export const siteConfig = {
     title: "Generador de códigos QR gratis, sin registro | Ubfix",
     description:
         "Crea códigos QR gratis de URL, WhatsApp, Wi-Fi, vCard, SMS, email, texto y ubicación. Personaliza colores y logo y descarga en PNG o SVG. Sin registro.",
+    logoUrl: "https://ubfix.com/apple-touch-icon.png",
 } as const;

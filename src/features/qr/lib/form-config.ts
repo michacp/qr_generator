@@ -1,5 +1,11 @@
 import type { QrType, QrValues } from "../types";
+import { COUNTRIES, DEFAULT_COUNTRY, countryLabel } from "./countries";
 
+export type TypeConfig = {
+    label: string;
+    fields: FieldConfig[];
+    defaults: QrValues;
+};
 export type FieldConfig = {
     name: string;
     label: string;
@@ -13,16 +19,10 @@ export type FieldConfig = {
     | "checkbox";
     inputMode?: "text" | "url" | "tel" | "email" | "decimal";
     placeholder?: string;
+    hint?: string;
     maxLength?: number;
     options?: { value: string; label: string }[];
 };
-
-export type TypeConfig = {
-    label: string;
-    fields: FieldConfig[];
-    defaults: QrValues;
-};
-
 export const QR_TYPE_CONFIG: Record<QrType, TypeConfig> = {
     url: {
         label: "URL",
@@ -80,11 +80,21 @@ export const QR_TYPE_CONFIG: Record<QrType, TypeConfig> = {
         label: "WhatsApp",
         fields: [
             {
+                name: "country",
+                label: "País",
+                input: "select",
+                options: COUNTRIES.map((c) => ({
+                    value: c.iso,
+                    label: countryLabel(c),
+                })),
+            },
+            {
                 name: "phone",
-                label: "Número (con código de país)",
+                label: "Número (sin código de país)",
                 input: "tel",
                 inputMode: "tel",
-                placeholder: "593991234567",
+                placeholder: "0991234567",
+                hint: "También puedes pegar el número completo con +, por ejemplo +57 300 123 4567.",
             },
             {
                 name: "message",
@@ -93,7 +103,7 @@ export const QR_TYPE_CONFIG: Record<QrType, TypeConfig> = {
                 maxLength: 300,
             },
         ],
-        defaults: { phone: "", message: "" },
+        defaults: { country: DEFAULT_COUNTRY, phone: "", message: "" },
     },
 
     sms: {

@@ -87,6 +87,6 @@ export const FAQ_ITEMS = [
     {
         question: "¿Cómo hago un QR de WhatsApp?",
         answer:
-            "Elige el tipo WhatsApp, escribe el número con código de país (en Ecuador, 593 seguido del número sin el 0 inicial) y, si quieres, un mensaje predefinido.",
+            "Elige el tipo WhatsApp, selecciona tu país y escribe tu número tal como lo marcas: el código de país se agrega solo. También puedes pegar el número completo con +. Si quieres, agrega un mensaje predefinido.",
     },
 ] as const;

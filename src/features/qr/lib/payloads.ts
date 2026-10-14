@@ -1,4 +1,5 @@
 import type { QrType, QrValues } from "../types";
+import { getCountry } from "./countries";
 
 const clean = (v?: string) => (v ?? "").trim();
 const onlyDigits = (v: string) => v.replace(/\D/g, "");
@@ -14,6 +15,38 @@ function escapeVCard(v: string) {
 
 function escapeWifi(v: string) {
     return v.replace(/([\\;,:"])/g, "\\$1");
+}
+
+const MIN_PHONE_DIGITS = 8;
+const MAX_PHONE_DIGITS = 15; // límite del estándar internacional (E.164)
+
+// Convierte lo que escribe la persona en el número internacional que pide wa.me
+function toInternationalDigits(raw: string, countryIso: string): string {
+    const text = raw.trim();
+    const digits = onlyDigits(text);
+    if (!digits) return "";
+
+    let full: string;
+
+    if (text.startsWith("+")) {
+        // Ya viene completo: +57 300 123 4567
+        full = digits;
+    } else if (digits.startsWith("00")) {
+        // Formato 0057...
+        full = digits.slice(2);
+    } else {
+        const { dial } = getCountry(countryIso);
+        // Quita el 0 inicial con el que se marca localmente
+        const national = digits.replace(/^0+/, "");
+        // Si ya empieza con el código del país y es largo, no se repite
+        const alreadyHasDial =
+            national.startsWith(dial) && national.length >= dial.length + 8;
+        full = alreadyHasDial ? national : `${dial}${national}`;
+    }
+
+    return full.length >= MIN_PHONE_DIGITS && full.length <= MAX_PHONE_DIGITS
+        ? full
+        : "";
 }
 
 type Builder = (v: QrValues) => string;
@@ -57,8 +90,8 @@ const builders: Record<QrType, Builder> = {
     },
 
     whatsapp: (v) => {
-        const phone = onlyDigits(v.phone ?? "");
-        if (phone.length < 8) return "";
+        const phone = toInternationalDigits(v.phone ?? "", v.country ?? "");
+        if (!phone) return "";
         const message = clean(v.message);
         return `https://wa.me/${phone}${message ? `?text=${encodeURIComponent(message)}` : ""
             }`;

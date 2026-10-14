@@ -86,6 +86,10 @@ export function QrForm({ type, values, onChange }: QrFormProps) {
                 className={inputClass}
               />
             )}
+
+            {field.hint && (
+              <p className="text-xs text-slate-500">{field.hint}</p>
+            )}
           </div>
         );
       })}

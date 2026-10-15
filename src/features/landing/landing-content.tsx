@@ -3,12 +3,15 @@ import {
   HOW_IT_WORKS,
   QR_TYPE_DESCRIPTIONS,
 } from "./landing-data";
-
+import type { ReactNode } from "react";
 const cardClass =
   "rounded-2xl border border-slate-200 bg-white p-5 shadow-sm";
 const h2Class = "text-2xl font-bold tracking-tight text-slate-900";
+type LandingContentProps = {
+  afterTypes?: ReactNode; // espacio opcional tras la sección de tipos de QR
+};
 
-export function LandingContent() {
+export function LandingContent({ afterTypes }: LandingContentProps) {
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-14 px-4 pb-20">
       <section aria-labelledby="como-funciona" className="flex flex-col gap-6">
@@ -43,7 +46,7 @@ export function LandingContent() {
           ))}
         </div>
       </section>
-
+ {afterTypes}
       <section
         aria-labelledby="garantia"
         className="flex flex-col gap-3 rounded-2xl border border-indigo-100 bg-indigo-50 p-6"

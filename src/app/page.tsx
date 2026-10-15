@@ -1,5 +1,6 @@
 import { QrView } from "@/features/qr";
 import { FAQ_ITEMS, LandingContent } from "@/features/landing";
+import { BannerAdSlot, NativeAdSlot } from "@/features/ads";
 import {
   JsonLd,
   buildPageMetadata,
@@ -18,7 +19,8 @@ export default function HomePage() {
     <main>
       <JsonLd data={buildStructuredData(FAQ_ITEMS)} />
       <QrView />
-      <LandingContent />
+      <BannerAdSlot />
+      <LandingContent afterTypes={<NativeAdSlot />} />
     </main>
   );
 }
